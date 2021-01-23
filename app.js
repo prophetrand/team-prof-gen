@@ -8,36 +8,110 @@ const fs = require("fs");
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
+const allTeam = [];
+
 const render = require("./lib/htmlRenderer");
 
-inquirer.prompt([
-    {
-        type: "input",
-        message: "What is the team manager's name?",
-        name: "manaName"
-    },
-    {
-        type: "input",
-        message: "What is the manager's ID?",
-        name: "manaId"
-    },
-    {
-        type: "input",
-        message: "What is the manager's email?",
-        name: "manaEmail"
-    },
-    {
-        type: "input",
-        message: "What is the manager's office number?",
-        name: "manaOffice"
-    },
-    {
+const nextOne = function() {
+    inquirer.prompt({
         type: "list",
         message: "What would you like to do next for the team?",
         choices: ["Add an engineer", "Add an intern", "Finish building my team"],
         name: "nextChoice"
-    }
-])
+    });
+}
+
+const manaAsk = function() {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the team manager's name?",
+            name: "name"
+        },
+        {
+            type: "input",
+            message: "What is the manager's ID?",
+            name: "id"
+        },
+        {
+            type: "input",
+            message: "What is the manager's email?",
+            name: "email"
+        },
+        {
+            type: "input",
+            message: "What is the manager's office number?",
+            name: "officeNumber"
+        },
+    ]).then(function(answers){
+        const manager = new Manager(answers.name, answers.id, answers.email, answers.officeNumber);
+        allTeam.push(manager);
+    });
+}
+
+const engiAsk = function() {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the engineer's name?",
+            name: "name"
+        },
+        {
+            type: "input",
+            message: "What is the engineer's ID?",
+            name: "id"
+        },
+        {
+            type: "input",
+            message: "What is the engineer's email?",
+            name: "email"
+        },
+        {
+            type: "input",
+            message: "What is the manager's GitHub account name?",
+            name: "github"
+        },
+    ]).then(function(answers){
+        const engineer = new Intern(answers.name, answers.id, answers.email, answers.github);
+        allTeam.push(engineer);
+    });
+}
+
+const intAsk = function() {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the intern's name?",
+            name: "name"
+        },
+        {
+            type: "input",
+            message: "What is the intern's ID?",
+            name: "id"
+        },
+        {
+            type: "input",
+            message: "What is the intern's email?",
+            name: "email"
+        },
+        {
+            type: "input",
+            message: "What school is the intern from?",
+            name: "school"
+        },
+    ]).then(function(answers){
+        const intern = new Intern(answers.name, answers.id, answers.email, answers.school);
+        allTeam.push(intern);
+    });
+}
+
+
+// TODO: call functions in proper order using async await?
+manaAsk();
+// engiAsk();
+// intAsk();
+// render(allTeam);
+
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
