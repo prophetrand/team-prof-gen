@@ -1,1 +1,1 @@
-# team-prof-gen
+# Team Profile Generator
