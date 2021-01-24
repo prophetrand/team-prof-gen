@@ -118,9 +118,7 @@ async function app() {
         await manAsk(allTeam);
         await nextOne(allTeam);
         
-        console.log(allTeam);
         const r = render(allTeam);
-        console.log(r);
 
         await writeFileAsync(outputPath, r);
     } catch (err) {
