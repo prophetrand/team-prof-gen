@@ -73,7 +73,7 @@ const engAsk = async function(allTeam) {
             name: "github"
         },
     ])
-    const engineer = new Intern(answers.name, answers.id, answers.email, answers.github);
+    const engineer = new Engineer(answers.name, answers.id, answers.email, answers.github);
     allTeam.push(engineer);
 }
 
