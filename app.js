@@ -4,16 +4,17 @@ const Intern = require("./lib/Intern");
 const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
+const util = require("util");
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
-const allTeam = [];
-
 const render = require("./lib/htmlRenderer");
 
-const nextOne = function() {
-    inquirer.prompt({
+const writeFileAsync = util.promisify(fs.writeFile);
+
+const nextOne = async function() {
+    await inquirer.prompt({
         type: "list",
         message: "What would you like to do next for the team?",
         choices: ["Add an engineer", "Add an intern", "Finish building my team"],
@@ -21,8 +22,8 @@ const nextOne = function() {
     });
 }
 
-const manaAsk = function() {
-    inquirer.prompt([
+const manAsk = async function(allTeam) {
+    const answers = await inquirer.prompt([
         {
             type: "input",
             message: "What is the team manager's name?",
@@ -43,14 +44,14 @@ const manaAsk = function() {
             message: "What is the manager's office number?",
             name: "officeNumber"
         },
-    ]).then(function(answers){
-        const manager = new Manager(answers.name, answers.id, answers.email, answers.officeNumber);
-        allTeam.push(manager);
-    });
+    ]);
+    
+    const manager = new Manager(answers.name, answers.id, answers.email, answers.officeNumber);
+    allTeam.push(manager);
 }
 
-const engiAsk = function() {
-    inquirer.prompt([
+const engAsk = async function(allTeam) {
+    const answers = await inquirer.prompt([
         {
             type: "input",
             message: "What is the engineer's name?",
@@ -71,14 +72,13 @@ const engiAsk = function() {
             message: "What is the manager's GitHub account name?",
             name: "github"
         },
-    ]).then(function(answers){
-        const engineer = new Intern(answers.name, answers.id, answers.email, answers.github);
-        allTeam.push(engineer);
-    });
+    ])
+    const engineer = new Intern(answers.name, answers.id, answers.email, answers.github);
+    allTeam.push(engineer);
 }
 
-const intAsk = function() {
-    inquirer.prompt([
+const intAsk = async function(allTeam) {
+    const answers = await inquirer.prompt([
         {
             type: "input",
             message: "What is the intern's name?",
@@ -99,19 +99,29 @@ const intAsk = function() {
             message: "What school is the intern from?",
             name: "school"
         },
-    ]).then(function(answers){
-        const intern = new Intern(answers.name, answers.id, answers.email, answers.school);
-        allTeam.push(intern);
-    });
+    ]);
+    const intern = new Intern(answers.name, answers.id, answers.email, answers.school);
+    allTeam.push(intern);
 }
 
+async function app() {
+    const allTeam = [];
+    
+    try {
+        await manAsk(allTeam);
+        await engAsk(allTeam);
+        await intAsk(allTeam);
+        console.log(allTeam);
+        const r = render(allTeam);
+        console.log(r);
 
-// TODO: call functions in proper order using async await?
-manaAsk();
-// engiAsk();
-// intAsk();
-// render(allTeam);
+        await writeFileAsync(outputPath, r);
+    } catch (err) {
+        console.log(err);
+    }
+}
 
+app();
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
